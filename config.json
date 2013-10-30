@@ -1,0 +1,9 @@
+{
+	"connection" : {
+		"host" : "localhost",
+		"user" : "root",
+		"password" : "root"
+	},
+	"fileName" : "out.txt",
+	"baseUrl" : "local.vergelijk.nl"
+}

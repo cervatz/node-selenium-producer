@@ -1,0 +1,12 @@
+{
+  "name": "selenium-producer",
+  "version": "0.0.1",
+  "description": "Performing query and writing selenium test file",
+  "main": "selenium_query.js",
+  "author": "Enrico Cervato",
+  "dependencies": {
+    "colors": "~0.6.0-1",
+    "mysql": "2.0.0-alpha9",
+    "async": "0.2.5"
+  }
+}
