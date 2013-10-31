@@ -1,6 +1,7 @@
 {
 	"connection" : {
 		"host" : "localhost",
+		"schema" : "pcg_nlNL",
 		"user" : "root",
 		"password" : "root"
 	},
