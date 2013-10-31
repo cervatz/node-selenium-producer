@@ -5,5 +5,5 @@
 		"password" : "root"
 	},
 	"fileName" : "out.txt",
-	"baseUrl" : "local.vergelijk.nl"
+	"baseUrl" : "http://vergelijknl.web.d.cgnet.nl"
 }

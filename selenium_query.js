@@ -11,70 +11,54 @@ var connection = mysql.createConnection({
 
 connection.connect
 
-var fd = fs.openSync(config.fileName, 'a+', 0666);  
-
-var categoriesArray1 = [];
-var categoriesArray2 = [];
-
+var categoriesArray = [];
 
 var loadCategories = function () {
-	connection.query('SELECT * FROM pcg_nlNL.category where categoryId between 2406 and 2414 order by categoryId', function(err, rows, fields) {
+	console.log("loadCategories - entering ...")
+
+	connection.query("SELECT * FROM pcg_nlNL.category order by categoryId", function(err, rows, fields) {
 
 	 	if (err) throw err
 
-  		fs.writeSync(fd, "first line");
-
 		async.forEach(rows,
 			function(category, done) {				
-				var categoryUrl =  config.baseUrl + "/" + category.urlFriendlyCategoryName
-
-				categoriesArray1[category.categoryId] = category
-				categoriesArray2[category.categoryId] = category
-
-				console.log(categoryUrl)
-
-				fs.writeSync(fd, categoryUrl + '\n')
+				categoriesArray[category.categoryId] = category				
 
 				done()
 			}, 
 			function(err) {
 		    	console.log("finished");
 
-		    	fs.closeSync(fd);
-
-		    	// console.log("categoriesArray.length=" + categoriesArray.length)
-
-
-				processCategories();
-
-		    			    	
+		    	writeCategories()
 		});
+
+		console.log("loadCategories - leaving ...")
 
 	});
 }
 
-var processCategories = function() {
-	console.log("processCategories");
-	categoriesArray1.forEach( function (category) {
+var writeCategories = function() {
+	console.log("writeCategories - entering ...")
+
+	if (fs.existsSync(config.fileName)) {
+		fs.unlinkSync(config.fileName);
+	}
+
+	var fd = fs.openSync(config.fileName, 'a+', 0666);  
+
+	categoriesArray.forEach( function(category) {
 			console.log("category=" + category.categoryId)
-			var categoryPath = createPathForCategory(category);
-			console.log("categoryPath=" + categoryPath);
+
+			if (category.type == 'rich' || category.type == 'carrental' || category.type == 'flights' || category.type == 'richlive' || category.type == 'crosslink') {
+				var categoryUrl =  config.baseUrl + "/" + category.urlFriendlyCategoryName
+				console.log("categoryUrl=" + categoryUrl);
+				fs.writeSync(fd, categoryUrl + '\n')				
+			}			
 		}
 	)
-}
 
-var createPathForCategory = function(category) {
-	return createPathForParent(category) + "/" + category.urlFriendlyCategoryName
+	fs.closeSync(fd);
+	console.log("writeCategories - leaving ...")
 }
-
-var createPathForParent = function(category) {
-	console.log("createPathForParent ")
-	if(category.parent==undefined && category.parent=='') {
-		return "";
-	} else {
-		return createPathForParent(categoriesArray1[category.parent]) + "/" + category.urlFriendlyCategoryName
-	}
-}
-
 
 loadCategories()
