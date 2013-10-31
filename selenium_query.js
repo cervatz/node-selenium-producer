@@ -13,9 +13,11 @@ connection.connect
 
 var fd = fs.openSync(config.fileName, 'a+', 0666);  
 
-var categoriesArray = [];
+var categoriesArray1 = [];
+var categoriesArray2 = [];
 
-var execute = function () {
+
+var loadCategories = function () {
 	connection.query('SELECT * FROM pcg_nlNL.category where categoryId between 2406 and 2414 order by categoryId', function(err, rows, fields) {
 
 	 	if (err) throw err
@@ -26,7 +28,8 @@ var execute = function () {
 			function(category, done) {				
 				var categoryUrl =  config.baseUrl + "/" + category.urlFriendlyCategoryName
 
-				categoriesArray[category.categoryId] = category
+				categoriesArray1[category.categoryId] = category
+				categoriesArray2[category.categoryId] = category
 
 				console.log(categoryUrl)
 
@@ -39,12 +42,10 @@ var execute = function () {
 
 		    	fs.closeSync(fd);
 
-		    	console.log("categoriesArray.length=" + categoriesArray.length)
+		    	// console.log("categoriesArray.length=" + categoriesArray.length)
 
-				categoriesArray.forEach( function (item) {
-						console.log("item=" + item.categoryId)						
-					}
-				)
+
+				processCategories();
 
 		    			    	
 		});
@@ -52,7 +53,28 @@ var execute = function () {
 	});
 }
 
-execute();
+var processCategories = function() {
+	console.log("processCategories");
+	categoriesArray1.forEach( function (category) {
+			console.log("category=" + category.categoryId)
+			var categoryPath = createPathForCategory(category);
+			console.log("categoryPath=" + categoryPath);
+		}
+	)
+}
+
+var createPathForCategory = function(category) {
+	return createPathForParent(category) + "/" + category.urlFriendlyCategoryName
+}
+
+var createPathForParent = function(category) {
+	console.log("createPathForParent ")
+	if(category.parent==undefined && category.parent=='') {
+		return "";
+	} else {
+		return createPathForParent(categoriesArray1[category.parent]) + "/" + category.urlFriendlyCategoryName
+	}
+}
 
 
-
+loadCategories()
